@@ -1,5 +1,5 @@
 // File: src/app/sms/smsB.tsx
-// Commit: Code input form to verify SMS code and complete verification
+// Commit: Verify hardcoded phone number against Railway backend and confirm admin access
 
 'use client'
 
@@ -16,16 +16,20 @@ export default function SmsB({ phone }: { phone: string }) {
     setError(null)
 
     try {
-      const res = await fetch('/api/verify-code', {
+      const res = await fetch('https://clockbase-sms-production.up.railway.app/verify-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, code }),
+        body: JSON.stringify({
+          phone: '+12364587488', // hardcoded, only one allowed
+          code,
+        }),
       })
 
       const data = await res.json()
 
       if (!res.ok) throw new Error(data.error || 'Invalid code')
 
+      localStorage.setItem('isAdminVerified', 'true')
       setSuccess(true)
     } catch (err: any) {
       setError(err.message || 'Verification failed')
