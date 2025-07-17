@@ -1,9 +1,9 @@
 // File: src/app/sms/smsB.tsx
-// Commit: Verify hardcoded phone number against Railway backend and confirm admin access
+// Commit: Verify code, confirm admin access, and redirect to /dashboard
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function SmsB({ phone }: { phone: string }) {
   const [code, setCode] = useState('')
@@ -20,7 +20,7 @@ export default function SmsB({ phone }: { phone: string }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          phone: '+12364587488', // hardcoded, only one allowed
+          phone: '+12364587488',
           code,
         }),
       })
@@ -37,6 +37,15 @@ export default function SmsB({ phone }: { phone: string }) {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (success) {
+      const redirect = setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1000)
+      return () => clearTimeout(redirect)
+    }
+  }, [success])
 
   if (success) {
     return (
