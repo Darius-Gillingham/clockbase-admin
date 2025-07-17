@@ -10,6 +10,7 @@ export default function SmsB({ phone }: { phone: string }) {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
+
   const supabase = createClientComponentClient()
 
   const handleVerify = async () => {
