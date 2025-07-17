@@ -1,5 +1,5 @@
 // File: src/app/sms/smsA.tsx
-// Commit: Phone input form that sends a 6-digit verification code via Twilio
+// Commit: Hardcoded SMS send to admin number via external Railway API
 
 'use client'
 
@@ -10,7 +10,6 @@ export default function SmsA({
 }: {
   onSuccess: (phone: string) => void
 }) {
-  const [phone, setPhone] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -18,20 +17,18 @@ export default function SmsA({
     setLoading(true)
     setError(null)
 
-    const formattedPhone = phone.startsWith('+') ? phone : `+1${phone.replace(/\D/g, '')}`
-
     try {
-      const res = await fetch('/api/send-code', {
+      const res = await fetch('https://clockbase-sms-production.up.railway.app/send-code', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: formattedPhone }),
+        body: JSON.stringify({}), // phone is hardcoded in backend
       })
 
       const data = await res.json()
 
       if (!res.ok) throw new Error(data.error || 'Failed to send code')
 
-      onSuccess(formattedPhone)
+      onSuccess('+12364587488') // static, since only one user is allowed
     } catch (err: any) {
       setError(err.message || 'Something went wrong')
     } finally {
@@ -42,13 +39,6 @@ export default function SmsA({
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-center text-black dark:text-white">Verify your phone</h2>
-      <input
-        type="tel"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        placeholder="Enter phone number"
-        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
       <button
         onClick={handleSendCode}
         disabled={loading}
