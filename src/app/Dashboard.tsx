@@ -1,5 +1,5 @@
 // File: src/app/Dashboard.tsx
-// Commit: Display and fetch rows directly from Companies table, removing typed abstraction
+// Commit: Fix incorrect `row.name` reference to `row.company_name` after SQL rename
 
 'use client'
 
@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Dashboard() {
-  // Use the imported supabase instance directly
   const [rows, setRows] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -20,6 +19,7 @@ export default function Dashboard() {
         .order('created_at', { ascending: false })
 
       if (error) {
+        console.error('Supabase error:', error)
         setError('Failed to load entries.')
       } else {
         setRows(data)
@@ -54,7 +54,7 @@ export default function Dashboard() {
           <tbody>
             {rows.map((row) => (
               <tr key={row.id} className="border-b">
-                <td className="py-2 pr-4">{row.name}</td>
+                <td className="py-2 pr-4">{row.company_name}</td>
                 <td className="py-2 pr-4">{row.business_number}</td>
                 <td className="py-2 pr-4">{row.manager_email}</td>
                 <td className="py-2">
