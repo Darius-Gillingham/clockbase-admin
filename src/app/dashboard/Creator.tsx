@@ -1,8 +1,5 @@
-// File: src/app/Creator.tsx
-// Commit: Create row directly in Companies table with raw Supabase insert
-
-// File: src/app/Creator.tsx
-// Commit: Add full company creation form with all fields and frontend hex code generation
+// File: src/app/dashboard/Creator.tsx
+// Commit: Add date validation and safer date parsing using valueAsDate for subscription dates
 
 'use client'
 
@@ -34,6 +31,16 @@ export default function Creator() {
     e.preventDefault()
     setLoading(true)
     setMessage(null)
+
+    // Validate date inputs
+    const validStart = !subscriptionStart || !isNaN(Date.parse(subscriptionStart))
+    const validEnd = !subscriptionEnd || !isNaN(Date.parse(subscriptionEnd))
+
+    if (!validStart || !validEnd) {
+      setMessage('Please enter valid subscription dates.')
+      setLoading(false)
+      return
+    }
 
     const { error } = await supabase.from('companies').insert([
       {
@@ -150,8 +157,11 @@ export default function Creator() {
         <label className="block font-medium">Subscription Start</label>
         <input
           type="date"
-          value={subscriptionStart}
-          onChange={(e) => setSubscriptionStart(e.target.value)}
+          onChange={(e) =>
+            setSubscriptionStart(
+              e.target.valueAsDate?.toISOString().split('T')[0] || ''
+            )
+          }
           className="border px-2 py-1 w-full"
         />
       </div>
@@ -160,8 +170,11 @@ export default function Creator() {
         <label className="block font-medium">Subscription End</label>
         <input
           type="date"
-          value={subscriptionEnd}
-          onChange={(e) => setSubscriptionEnd(e.target.value)}
+          onChange={(e) =>
+            setSubscriptionEnd(
+              e.target.valueAsDate?.toISOString().split('T')[0] || ''
+            )
+          }
           className="border px-2 py-1 w-full"
         />
       </div>
