@@ -1,6 +1,3 @@
-// File: src/app/editor.tsx
-// Commit: Update subscription date inputs to type="month" with YYYY-MM-01 formatting on save
-
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -26,23 +23,30 @@ export default function Editor() {
 
   const startEdit = (company: any) => {
     setEditingId(company.id)
+    const convert = (s: string) =>
+      s && /^\d{4}-\d{2}-\d{2}$/.test(s)
+        ? `${s.slice(5, 7)}-${s.slice(0, 4)}`
+        : ''
     setEditFields({
       ...company,
-      subscription_start: company.subscription_start?.slice(0, 7) || '',
-      subscription_end: company.subscription_end?.slice(0, 7) || '',
+      subscription_start: convert(company.subscription_start),
+      subscription_end: convert(company.subscription_end),
     })
   }
 
   const saveEdit = async () => {
     if (!editingId) return
 
+    const revert = (s: string) =>
+      /^\d{2}-\d{4}$/.test(s) ? `${s.slice(3, 7)}-${s.slice(0, 2)}-01` : null
+
     const updated = {
       ...editFields,
       subscription_start: editFields.subscription_start
-        ? editFields.subscription_start + '-01'
+        ? revert(editFields.subscription_start)
         : null,
       subscription_end: editFields.subscription_end
-        ? editFields.subscription_end + '-01'
+        ? revert(editFields.subscription_end)
         : null,
     }
 
@@ -124,19 +128,21 @@ export default function Editor() {
                 className="border p-1 w-full"
               />
               <input
-                type="month"
+                type="text"
+                inputMode="numeric"
+                placeholder="MM-YYYY"
+                pattern="^\d{2}-\d{4}$"
                 value={editFields.subscription_start}
-                onChange={(e) =>
-                  onChange('subscription_start', e.target.value)
-                }
+                onChange={(e) => onChange('subscription_start', e.target.value)}
                 className="border p-1 w-full"
               />
               <input
-                type="month"
+                type="text"
+                inputMode="numeric"
+                placeholder="MM-YYYY"
+                pattern="^\d{2}-\d{4}$"
                 value={editFields.subscription_end}
-                onChange={(e) =>
-                  onChange('subscription_end', e.target.value)
-                }
+                onChange={(e) => onChange('subscription_end', e.target.value)}
                 className="border p-1 w-full"
               />
               <label className="flex gap-2 items-center">

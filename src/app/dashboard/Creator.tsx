@@ -1,6 +1,3 @@
-// File: src/app/dashboard/Creator.tsx
-// Commit: Switch subscription date inputs to month-only and auto-complete as YYYY-MM-01
-
 'use client'
 
 import { useState } from 'react'
@@ -27,17 +24,26 @@ export default function Creator() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
 
+  const parseDate = (input: string): string | null => {
+    const match = input.match(/^(\d{2})-(\d{4})$/)
+    if (!match) return null
+    const [, mm, yyyy] = match
+    return `${yyyy}-${mm}-01`
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setMessage(null)
 
-    // Validate YYYY-MM-DD strings (after appending -01)
-    const validStart = !subscriptionStart || !isNaN(Date.parse(subscriptionStart))
-    const validEnd = !subscriptionEnd || !isNaN(Date.parse(subscriptionEnd))
+    const parsedStart = subscriptionStart ? parseDate(subscriptionStart) : null
+    const parsedEnd = subscriptionEnd ? parseDate(subscriptionEnd) : null
+
+    const validStart = !subscriptionStart || parsedStart
+    const validEnd = !subscriptionEnd || parsedEnd
 
     if (!validStart || !validEnd) {
-      setMessage('Please enter valid subscription dates.')
+      setMessage('Please enter subscription dates in MM-YYYY format.')
       setLoading(false)
       return
     }
@@ -51,8 +57,8 @@ export default function Creator() {
         manager_phone: managerPhone,
         employee_reg_code: employeeRegCode,
         subscription_tier: subscriptionTier,
-        subscription_start: subscriptionStart || null,
-        subscription_end: subscriptionEnd || null,
+        subscription_start: parsedStart,
+        subscription_end: parsedEnd,
         auto_renew: autoRenew,
       },
     ])
@@ -154,19 +160,27 @@ export default function Creator() {
       </div>
 
       <div>
-        <label className="block font-medium">Subscription Start</label>
+        <label className="block font-medium">Subscription Start (MM-YYYY)</label>
         <input
-          type="month"
-          onChange={(e) => setSubscriptionStart(e.target.value + '-01')}
+          type="text"
+          inputMode="numeric"
+          pattern="^\d{2}-\d{4}$"
+          placeholder="MM-YYYY"
+          value={subscriptionStart}
+          onChange={(e) => setSubscriptionStart(e.target.value)}
           className="border px-2 py-1 w-full"
         />
       </div>
 
       <div>
-        <label className="block font-medium">Subscription End</label>
+        <label className="block font-medium">Subscription End (MM-YYYY)</label>
         <input
-          type="month"
-          onChange={(e) => setSubscriptionEnd(e.target.value + '-01')}
+          type="text"
+          inputMode="numeric"
+          pattern="^\d{2}-\d{4}$"
+          placeholder="MM-YYYY"
+          value={subscriptionEnd}
+          onChange={(e) => setSubscriptionEnd(e.target.value)}
           className="border px-2 py-1 w-full"
         />
       </div>
