@@ -1,12 +1,16 @@
-// File: src/app/Searcher.tsx
-// Commit: Update search results to match full company schema and renamed field structure
+// File: src/app/dashboard/Searcher.tsx
+// Commit: Add onSelect callback to pass selected company to parent editor
 
 'use client'
 
 import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 
-export default function Searcher() {
+export default function Searcher({
+  onSelect,
+}: {
+  onSelect: (company: any) => void
+}) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -33,8 +37,7 @@ export default function Searcher() {
   }
 
   return (
-    <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold">Search Companies</h2>
+    <div className="space-y-4">
       <div className="flex gap-2">
         <input
           type="text"
@@ -50,22 +53,22 @@ export default function Searcher() {
           Search
         </button>
       </div>
+
       {loading && <p>Loading...</p>}
       {error && <p className="text-red-500">{error}</p>}
+
       {results.length > 0 && (
         <ul className="space-y-2">
           {results.map((company) => (
-            <li key={company.id} className="border rounded p-2 text-sm">
-              <p><strong>Name:</strong> {company.company_name}</p>
-              <p><strong>BN:</strong> {company.business_number}</p>
-              <p><strong>Manager:</strong> {company.manager_name}</p>
-              <p><strong>Email:</strong> {company.manager_email}</p>
-              <p><strong>Phone:</strong> {company.manager_phone}</p>
-              <p><strong>Reg Code:</strong> {company.employee_reg_code}</p>
-              <p><strong>Tier:</strong> {company.subscription_tier}</p>
-              <p><strong>Start:</strong> {company.subscription_start || '—'}</p>
-              <p><strong>End:</strong> {company.subscription_end || '—'}</p>
-              <p><strong>Renew:</strong> {company.auto_renew ? 'Yes' : 'No'}</p>
+            <li
+              key={company.id}
+              className="border rounded p-2 hover:bg-gray-100 cursor-pointer"
+              onClick={() => onSelect(company)}
+            >
+              <p><strong>{company.company_name}</strong></p>
+              <p className="text-sm text-gray-600">
+                {company.manager_name} • {company.manager_email}
+              </p>
             </li>
           ))}
         </ul>

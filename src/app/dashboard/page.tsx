@@ -60,7 +60,9 @@ export default function DashboardPage() {
 
       <div className="bg-white dark:bg-neutral-900 p-6 rounded shadow">
         <h2 className="text-xl font-semibold mb-4">Search Companies</h2>
-        <Searcher />
+        <Searcher onSelect={(company: any) => {
+          triggerRefresh();
+        }} />
       </div>
     </div>
   )
