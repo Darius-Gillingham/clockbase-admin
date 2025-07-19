@@ -1,5 +1,5 @@
 // File: src/app/dashboard/Creator.tsx
-// Commit: Add date validation and safer date parsing using valueAsDate for subscription dates
+// Commit: Switch subscription date inputs to month-only and auto-complete as YYYY-MM-01
 
 'use client'
 
@@ -32,7 +32,7 @@ export default function Creator() {
     setLoading(true)
     setMessage(null)
 
-    // Validate date inputs
+    // Validate YYYY-MM-DD strings (after appending -01)
     const validStart = !subscriptionStart || !isNaN(Date.parse(subscriptionStart))
     const validEnd = !subscriptionEnd || !isNaN(Date.parse(subscriptionEnd))
 
@@ -156,12 +156,8 @@ export default function Creator() {
       <div>
         <label className="block font-medium">Subscription Start</label>
         <input
-          type="date"
-          onChange={(e) =>
-            setSubscriptionStart(
-              e.target.valueAsDate?.toISOString().split('T')[0] || ''
-            )
-          }
+          type="month"
+          onChange={(e) => setSubscriptionStart(e.target.value + '-01')}
           className="border px-2 py-1 w-full"
         />
       </div>
@@ -169,12 +165,8 @@ export default function Creator() {
       <div>
         <label className="block font-medium">Subscription End</label>
         <input
-          type="date"
-          onChange={(e) =>
-            setSubscriptionEnd(
-              e.target.valueAsDate?.toISOString().split('T')[0] || ''
-            )
-          }
+          type="month"
+          onChange={(e) => setSubscriptionEnd(e.target.value + '-01')}
           className="border px-2 py-1 w-full"
         />
       </div>

@@ -1,5 +1,5 @@
 // File: src/app/editor.tsx
-// Commit: Update editor form to support all fields from full company schema
+// Commit: Update subscription date inputs to type="month" with YYYY-MM-01 formatting on save
 
 'use client'
 
@@ -26,15 +26,29 @@ export default function Editor() {
 
   const startEdit = (company: any) => {
     setEditingId(company.id)
-    setEditFields({ ...company })
+    setEditFields({
+      ...company,
+      subscription_start: company.subscription_start?.slice(0, 7) || '',
+      subscription_end: company.subscription_end?.slice(0, 7) || '',
+    })
   }
 
   const saveEdit = async () => {
     if (!editingId) return
 
+    const updated = {
+      ...editFields,
+      subscription_start: editFields.subscription_start
+        ? editFields.subscription_start + '-01'
+        : null,
+      subscription_end: editFields.subscription_end
+        ? editFields.subscription_end + '-01'
+        : null,
+    }
+
     const { error } = await supabase
       .from('companies')
-      .update(editFields)
+      .update(updated)
       .eq('id', editingId)
 
     if (error) {
@@ -110,15 +124,19 @@ export default function Editor() {
                 className="border p-1 w-full"
               />
               <input
-                type="date"
-                value={editFields.subscription_start || ''}
-                onChange={(e) => onChange('subscription_start', e.target.value)}
+                type="month"
+                value={editFields.subscription_start}
+                onChange={(e) =>
+                  onChange('subscription_start', e.target.value)
+                }
                 className="border p-1 w-full"
               />
               <input
-                type="date"
-                value={editFields.subscription_end || ''}
-                onChange={(e) => onChange('subscription_end', e.target.value)}
+                type="month"
+                value={editFields.subscription_end}
+                onChange={(e) =>
+                  onChange('subscription_end', e.target.value)
+                }
                 className="border p-1 w-full"
               />
               <label className="flex gap-2 items-center">
