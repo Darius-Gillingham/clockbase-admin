@@ -7,7 +7,7 @@
 'use client'
 
 import { useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
+import { supabase } from '../../lib/supabaseClient'
 
 function generateHexCode() {
   return Math.floor(Math.random() * 0xffffffff)
