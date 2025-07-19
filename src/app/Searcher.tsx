@@ -1,9 +1,12 @@
+// File: src/app/Searcher.tsx
+// Commit: Update search results to match full company schema and renamed field structure
+
 'use client'
 
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-export default function CompanySearch() {
+export default function Searcher() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
@@ -16,7 +19,7 @@ export default function CompanySearch() {
     const { data, error } = await supabase
       .from('companies')
       .select('*')
-      .ilike('name', `%${query}%`)
+      .ilike('company_name', `%${query}%`)
 
     setLoading(false)
 
@@ -52,10 +55,17 @@ export default function CompanySearch() {
       {results.length > 0 && (
         <ul className="space-y-2">
           {results.map((company) => (
-            <li key={company.id} className="border rounded p-2">
-              <p><strong>Name:</strong> {company.name}</p>
-              <p><strong>BN:</strong> {company.bn}</p>
-              <p><strong>Manager:</strong> {company.manager_name} ({company.manager_email})</p>
+            <li key={company.id} className="border rounded p-2 text-sm">
+              <p><strong>Name:</strong> {company.company_name}</p>
+              <p><strong>BN:</strong> {company.business_number}</p>
+              <p><strong>Manager:</strong> {company.manager_name}</p>
+              <p><strong>Email:</strong> {company.manager_email}</p>
+              <p><strong>Phone:</strong> {company.manager_phone}</p>
+              <p><strong>Reg Code:</strong> {company.employee_reg_code}</p>
+              <p><strong>Tier:</strong> {company.subscription_tier}</p>
+              <p><strong>Start:</strong> {company.subscription_start || '—'}</p>
+              <p><strong>End:</strong> {company.subscription_end || '—'}</p>
+              <p><strong>Renew:</strong> {company.auto_renew ? 'Yes' : 'No'}</p>
             </li>
           ))}
         </ul>

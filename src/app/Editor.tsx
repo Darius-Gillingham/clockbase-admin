@@ -1,12 +1,15 @@
+// File: src/app/editor.tsx
+// Commit: Update editor form to support all fields from full company schema
+
 'use client'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-export default function CompanyEditor() {
+export default function Editor() {
   const [companies, setCompanies] = useState<any[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editFields, setEditFields] = useState<Record<string, string>>({})
+  const [editFields, setEditFields] = useState<Record<string, any>>({})
 
   useEffect(() => {
     const fetchCompanies = async () => {
@@ -23,12 +26,7 @@ export default function CompanyEditor() {
 
   const startEdit = (company: any) => {
     setEditingId(company.id)
-    setEditFields({
-      name: company.name || '',
-      bn: company.bn || '',
-      manager_email: company.manager_email || '',
-      manager_name: company.manager_name || '',
-    })
+    setEditFields({ ...company })
   }
 
   const saveEdit = async () => {
@@ -53,7 +51,7 @@ export default function CompanyEditor() {
     setEditFields({})
   }
 
-  const onChange = (field: string, value: string) => {
+  const onChange = (field: string, value: any) => {
     setEditFields(prev => ({ ...prev, [field]: value }))
   }
 
@@ -69,15 +67,21 @@ export default function CompanyEditor() {
           {editingId === company.id ? (
             <div className="space-y-2">
               <input
-                value={editFields.name}
-                onChange={(e) => onChange('name', e.target.value)}
+                value={editFields.company_name}
+                onChange={(e) => onChange('company_name', e.target.value)}
                 placeholder="Company Name"
                 className="border p-1 w-full"
               />
               <input
-                value={editFields.bn}
-                onChange={(e) => onChange('bn', e.target.value)}
+                value={editFields.business_number}
+                onChange={(e) => onChange('business_number', e.target.value)}
                 placeholder="Business Number"
+                className="border p-1 w-full"
+              />
+              <input
+                value={editFields.manager_name}
+                onChange={(e) => onChange('manager_name', e.target.value)}
+                placeholder="Manager Name"
                 className="border p-1 w-full"
               />
               <input
@@ -87,11 +91,45 @@ export default function CompanyEditor() {
                 className="border p-1 w-full"
               />
               <input
-                value={editFields.manager_name}
-                onChange={(e) => onChange('manager_name', e.target.value)}
-                placeholder="Manager Name"
+                value={editFields.manager_phone}
+                onChange={(e) => onChange('manager_phone', e.target.value)}
+                placeholder="Manager Phone"
                 className="border p-1 w-full"
               />
+              <input
+                value={editFields.employee_reg_code}
+                onChange={(e) => onChange('employee_reg_code', e.target.value)}
+                placeholder="Employee Registration Code"
+                pattern="[a-fA-F0-9]{8}"
+                className="border p-1 w-full"
+              />
+              <input
+                value={editFields.subscription_tier}
+                onChange={(e) => onChange('subscription_tier', e.target.value)}
+                placeholder="Subscription Tier"
+                className="border p-1 w-full"
+              />
+              <input
+                type="date"
+                value={editFields.subscription_start || ''}
+                onChange={(e) => onChange('subscription_start', e.target.value)}
+                className="border p-1 w-full"
+              />
+              <input
+                type="date"
+                value={editFields.subscription_end || ''}
+                onChange={(e) => onChange('subscription_end', e.target.value)}
+                className="border p-1 w-full"
+              />
+              <label className="flex gap-2 items-center">
+                <input
+                  type="checkbox"
+                  checked={editFields.auto_renew}
+                  onChange={(e) => onChange('auto_renew', e.target.checked)}
+                />
+                Auto Renew
+              </label>
+
               <div className="flex gap-2">
                 <button onClick={saveEdit} className="bg-blue-500 text-white px-3 py-1 rounded">
                   Save
@@ -103,10 +141,16 @@ export default function CompanyEditor() {
             </div>
           ) : (
             <div>
-              <p><strong>Name:</strong> {company.name}</p>
-              <p><strong>BN:</strong> {company.bn}</p>
-              <p><strong>Manager Email:</strong> {company.manager_email}</p>
-              <p><strong>Manager Name:</strong> {company.manager_name}</p>
+              <p><strong>Name:</strong> {company.company_name}</p>
+              <p><strong>BN:</strong> {company.business_number}</p>
+              <p><strong>Manager:</strong> {company.manager_name}</p>
+              <p><strong>Email:</strong> {company.manager_email}</p>
+              <p><strong>Phone:</strong> {company.manager_phone}</p>
+              <p><strong>Reg Code:</strong> {company.employee_reg_code}</p>
+              <p><strong>Tier:</strong> {company.subscription_tier}</p>
+              <p><strong>Start:</strong> {company.subscription_start}</p>
+              <p><strong>End:</strong> {company.subscription_end}</p>
+              <p><strong>Renew:</strong> {company.auto_renew ? 'Yes' : 'No'}</p>
               <button onClick={() => startEdit(company)} className="text-blue-600 underline mt-2">
                 Edit
               </button>
